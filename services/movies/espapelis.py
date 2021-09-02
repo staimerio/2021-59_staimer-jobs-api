@@ -12,8 +12,16 @@ from retic.services.responses import success_response
 # Time
 from time import sleep
 
+# services
+import services.general.wordpress as wordpress
+
 # Constants
 ESPAPELIS_URL = app.config.get('ESPAPELIS_URL')
+ESPAPELIS_LOGIN = app.config.get('ESPAPELIS_LOGIN')
+ESPAPELIS_ADMIN = app.config.get('ESPAPELIS_ADMIN')
+ESPAPELIS_USERNAME = app.config.get('ESPAPELIS_USERNAME')
+ESPAPELIS_PASSWORD = app.config.get('ESPAPELIS_PASSWORD')
+
 
 def scrapper_espapelis_movies(_page=1):
     """Variables"""
@@ -23,7 +31,10 @@ def scrapper_espapelis_movies(_page=1):
         u'range': _page,
         u'action': "action_pelisplushd"
     }
-    _req = request_to_ajax(_url, _params)
+
+    _session = wordpress.login(
+        ESPAPELIS_LOGIN, ESPAPELIS_ADMIN, ESPAPELIS_USERNAME, ESPAPELIS_PASSWORD)
+    _req = request_to_ajax(_url, _params, _session)
     """Check if status code is 200"""
     if _req.status_code != 200:
         raise Exception("The request to {0} failed".format(_url))
@@ -33,31 +44,31 @@ def scrapper_espapelis_movies(_page=1):
     _uris_raw = _soup.find_all(class_='url-res-table')
     _uris = [_uri.text for _uri in _uris_raw]
     """Publish links"""
-    for _uri in _uris:        
+    for _uri in _uris:
         try:
             """Add link"""
             _params_item = {
                 'uri': _uri,
                 'action': 'action_pelisplushd_all'
             }
-            _result = request_to_ajax(_url, _params_item)
-            _item=None
+            _result = request_to_ajax(_url, _params_item, _session)
+            _item = None
             """Get json"""
-            _item = _result.json()        
+            _item = _result.json()
             """If it was published, then add"""
             if _item['id']:
                 _items.append(_item)
         except Exception as e:
-            print(e) 
-    """Transform data"""       
-    _data_response={
-        "items":_items
+            print(e)
+    """Transform data"""
+    _data_response = {
+        "items": _items
     }
     """Return data"""
     return success_response(data=_data_response)
 
 
-def request_to_ajax(url, data):
+def request_to_ajax(url, data, session=None):
     _headers = {
         # 'accept': '*/*',
         # 'accept-encoding': 'gzip, deflate, br',
@@ -78,4 +89,8 @@ def request_to_ajax(url, data):
         'X-Requested-With': 'XMLHttpRequest'
     }
     """Make request"""
-    return requests.post(url, data=data, headers=_headers)
+    if session:
+        _result = session.post(url, data=data)
+    else:
+        _result = requests.post(url, data=data, headers=_headers)
+    return _result
