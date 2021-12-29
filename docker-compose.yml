@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "1859:1859"
+    environment:
+      APP_HOSTNAME: "0.0.0.0"
+      APP_PORT: 1859
+
+      #MYSQL database
+      MYSQL_DATABASE: "nmkuivmj_jobs"
+      MYSQL_USERNAME: "nmkuivmj_jobs"
+      MYSQL_PASSWORD: "DCYdS3YwqQu%"
+      MYSQL_PORT: 3306
+      MYSQL_HOST: "jobs.gnula2.xyz"
+      MYSQL_QUERY:
+      MYSQL_DRIVERNAME: "mysql+pymysql"
+      MYSQL_ECHO: 1
+      MYSQL_POOL_PREPING: 1
+      MYSQL_POOL_SIZE: 20
+      MYSQL_MAX_OVERFLOW: 0
