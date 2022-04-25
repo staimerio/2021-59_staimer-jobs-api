@@ -114,11 +114,6 @@ def scrapper_movies(
             """Save chapters in database"""
             _session.add(_item)
             _session.flush()
-            """Save in database"""
-        else:
-            print("*********_item.value = *********")
-            _item.value = str(int(_item.value)+1)
-        _session.commit()
 
         _items = scrapper_movies_publish(
             wp_login,
@@ -128,8 +123,14 @@ def scrapper_movies(
             wp_url,
             _item.value,
         )
-
+        
+        if(len(_items) == 0):
+            print("*********_item.value = *********")
+            _item.value = str(int(_item.value)+1)
+        
+        _session.commit()
         _session.close()
+
 
     """Transform data"""
     _data_response = {
