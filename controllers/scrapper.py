@@ -32,6 +32,7 @@ def scrapper_movies(req: Request, res: Response, next: Next):
         req.param('wp_username'),
         req.param('wp_password'),
         req.param('wp_url'),
+        req.param('origin', "pelisplushd"),
         req.param('page', 1),
     )
     """Check if exist an error"""
@@ -56,7 +57,7 @@ def scrapper_shows(req: Request, res: Response, next: Next):
         )
 
     """Get all novel from latests page"""
-    _result = scrapper.scrapper_shows(        
+    _result = scrapper.scrapper_shows(
         req.param('wp_url'),
         req.param('page', 1),
     )

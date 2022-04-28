@@ -28,13 +28,14 @@ def scrapper_movies_publish(
     wp_username,
     wp_password,
     wp_url,
+    origin,
     _page=1,
 ):
     _items = []
     _url = '{0}/wp-admin/admin-ajax.php'.format(wp_url)
     _params = {
         u'range': _page,
-        u'action': "action_pelisplushd"
+        u'action': "action_{0}".format(origin)
     }
 
     _session = wordpress.login(
@@ -59,7 +60,7 @@ def scrapper_movies_publish(
             """Add link"""
             _params_item = {
                 'uri': _uri,
-                'action': 'action_pelisplushd_all'
+                'action': 'action_{0}_all'.format(origin)
             }
             _result = request_to_ajax(_url, _params_item, _session)
             _item = None
@@ -82,6 +83,7 @@ def scrapper_movies(
     wp_username,
     wp_password,
     wp_url,
+    origin,
     _page=1,
 ):
     print("*********scrapper_movies_publish*********")
@@ -92,6 +94,7 @@ def scrapper_movies(
         wp_username,
         wp_password,
         wp_url,
+        origin,
         _page,
     )
     print("*********len(_items)*********")
@@ -121,16 +124,16 @@ def scrapper_movies(
             wp_username,
             wp_password,
             wp_url,
+            origin,
             _item.value,
         )
-        
+
         if(len(_items) == 0):
             print("*********_item.value = *********")
             _item.value = str(int(_item.value)+1)
-        
+
         _session.commit()
         _session.close()
-
 
     """Transform data"""
     _data_response = {
@@ -153,7 +156,7 @@ def scrapper_shows_publish(
     wp_url,
     _page=1,
 ):
-    
+
     _url = '{0}/scrapper-ajax-pelisplus-series.php'.format(wp_url)
     _params = {
         u'range': _page,
