@@ -10,6 +10,9 @@ from bs4 import BeautifulSoup
 from retic.services.responses import success_response
 
 # Time
+from datetime import datetime
+
+# Time
 from time import sleep
 
 # services
@@ -67,7 +70,7 @@ def scrapper_movies_publish(
             """Get json"""
             _item = _result.json()
             """If it was published, then add"""
-            if _item['id']:
+            if 'id' in _item:
                 _items.append(_item)
         except Exception as e:
             print(e)
@@ -86,26 +89,30 @@ def scrapper_movies(
     origin,
     _page=1,
 ):
-    print("*********scrapper_movies_publish*********")
-    """Variables"""
-    _items = scrapper_movies_publish(
-        wp_login,
-        wp_admin,
-        wp_username,
-        wp_password,
-        wp_url,
-        origin,
-        _page,
-    )
+    _items = []
+    """Find in database"""
+    _session = app.apps.get("db_sqlalchemy")()
+    _item = _session.query(Scrapper).\
+        filter(Scrapper.key == wp_url, Scrapper.type == constants.TYPES['movies']).\
+        first()
+
+    _date = datetime.now()
+
+    if not _item or (_item.created_at.year != _date.year or _item.created_at.day != _date.day):
+        print("*********scrapper_movies_publish*********")
+        """Variables"""
+        _items = scrapper_movies_publish(
+            wp_login,
+            wp_admin,
+            wp_username,
+            wp_password,
+            wp_url,
+            origin,
+            _page,
+        )
     print("*********len(_items)*********")
     """Check if almost one item was published"""
     if(len(_items) == 0):
-        """Find in database"""
-        _session = app.apps.get("db_sqlalchemy")()
-        _item = _session.query(Scrapper).\
-            filter(Scrapper.key == wp_url, Scrapper.type == constants.TYPES['movies']).\
-            first()
-
         print("*********if _item is None*********")
         if _item is None:
             print("*********_item = Scrapper*********")

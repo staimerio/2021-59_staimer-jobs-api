@@ -24,7 +24,7 @@ class Scrapper(Base, SerializerMixin):
     type = Column(Integer)
     is_active = Column(Boolean, default=True)
     is_deleted = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
     deleted_at = Column(DateTime, nullable=True)
 
     """Relationships"""
