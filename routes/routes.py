@@ -8,3 +8,4 @@ router = Router()
 
 router.post("/movies/scrapper", scrapper.scrapper_movies)
 router.post("/shows/scrapper", scrapper.scrapper_shows)
+router.post("/series/scrapper", scrapper.scrapper_series)

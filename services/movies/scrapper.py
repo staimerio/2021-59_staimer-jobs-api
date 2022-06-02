@@ -315,3 +315,129 @@ def scrapper_shows(
     }
     """Return data"""
     return success_response(data=_data_response)
+
+
+def scrapper_series(
+    wp_login,
+    wp_admin,
+    wp_username,
+    wp_password,
+    wp_url,
+    origin,
+    _page=1,
+):
+    _items = []
+    """Find in database"""
+    _session = app.apps.get("db_sqlalchemy")()
+    _item = _session.query(Scrapper).\
+        filter(Scrapper.key == wp_url, Scrapper.type == constants.TYPES['shows']).\
+        first()
+
+    _date = datetime.now()
+
+    if not _item or (_item.created_at.year != _date.year or _item.created_at.day != _date.day):
+        print("*********scrapper_series_publish*********")
+        """Variables"""
+        _items = scrapper_series_publish(
+            wp_login,
+            wp_admin,
+            wp_username,
+            wp_password,
+            wp_url,
+            origin,
+            _page,
+        )
+    print("*********len(_items)*********")
+    """Check if almost one item was published"""
+    if(len(_items) == 0):
+        print("*********if _item is None*********")
+        if _item is None:
+            print("*********_item = Scrapper*********")
+            _item = Scrapper(
+                key=wp_url,
+                type=constants.TYPES['shows'],
+                value=_page+1
+            )
+            """Save chapters in database"""
+            _session.add(_item)
+            _session.flush()
+
+        _items = scrapper_series_publish(
+            wp_login,
+            wp_admin,
+            wp_username,
+            wp_password,
+            wp_url,
+            origin,
+            _page,
+        )
+
+        if(len(_items) == 0):
+            print("*********_item.value = *********")
+            _item.value = str(int(_item.value)+1)
+
+        _session.commit()
+        _session.close()
+
+    """Transform data"""
+    _data_response = {
+        "items": _items
+    }
+    """Return data"""
+    return success_response(data=_data_response)
+
+
+
+def scrapper_series_publish(
+    wp_login,
+    wp_admin,
+    wp_username,
+    wp_password,
+    wp_url,
+    origin,
+    _page=1,
+):
+    _items = []
+    _url = '{0}/wp-admin/admin-ajax.php'.format(wp_url)
+    _params = {
+        u'range': _page,
+        u'action': "action_{0}_series".format(origin)
+    }
+
+    _session = wordpress.login(
+        wp_login, wp_admin, wp_username, wp_password)
+    _req = request_to_ajax(_url, _params, _session)
+    print("*********wordpress.login*********")
+    print(wp_login)
+    print(wp_admin)
+    print(wp_username)
+    print(wp_password)
+    """Check if status code is 200"""
+    if _req.status_code != 200:
+        raise Exception("The request to {0} failed".format(_url))
+    """Parse content"""
+    _soup = BeautifulSoup(_req.text, 'html.parser')
+    """Get links"""
+    _uris_raw = _soup.find_all(class_='url-res-table')
+    _uris = [_uri.text for _uri in _uris_raw]
+    """Publish links"""
+    for _uri in _uris:
+        try:
+            """Add link"""
+            _params_item = {
+                'uri': _uri,
+                'action': 'action_{0}_series_all'.format(origin)
+            }
+            _result = request_to_ajax(_url, _params_item, _session)
+            _item = None
+            """Get json"""
+            _item = _result.json()
+            """If it was published, then add"""
+            if 'serie_id' in _item:
+                _items.append(_item)
+        except Exception as e:
+            print(e)
+
+    print("*********return _items*********")
+    print(len(_items))
+    return _items
