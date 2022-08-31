@@ -9,12 +9,13 @@ from services.movies import scrapper
 
 def scrapper_movies(req: Request, res: Response, next: Next):
     """Validate obligate params"""
+    _wp_url=req.param('wp_url')
     _validate = validate_obligate_fields({
         u'wp_login': req.param('wp_login'),
         u'wp_admin': req.param('wp_admin'),
         u'wp_username': req.param('wp_username'),
         u'wp_password': req.param('wp_password'),
-        u'wp_url': req.param('wp_url'),
+        u'wp_url': _wp_url,
     })
 
     """Check if has errors return a error response"""
@@ -25,13 +26,16 @@ def scrapper_movies(req: Request, res: Response, next: Next):
             )
         )
 
+    if _wp_url[-1]=='/':
+        _wp_url=_wp_url[:-1]
+
     """Get all novel from latests page"""
     _result = scrapper.scrapper_movies(
         req.param('wp_login'),
         req.param('wp_admin'),
         req.param('wp_username'),
         req.param('wp_password'),
-        req.param('wp_url'),
+        _wp_url,
         req.param('origin', "pelisplushd"),
         req.param('page', 1),
     )
@@ -44,8 +48,9 @@ def scrapper_movies(req: Request, res: Response, next: Next):
 
 def scrapper_shows(req: Request, res: Response, next: Next):
     """Validate obligate params"""
+    _wp_url=req.param('wp_url')
     _validate = validate_obligate_fields({
-        u'wp_url': req.param('wp_url'),
+        u'wp_url': _wp_url,
     })
 
     """Check if has errors return a error response"""
@@ -56,9 +61,12 @@ def scrapper_shows(req: Request, res: Response, next: Next):
             )
         )
 
+    if _wp_url[-1]=='/':
+        _wp_url=_wp_url[:-1]
+
     """Get all novel from latests page"""
     _result = scrapper.scrapper_shows(
-        req.param('wp_url'),
+        _wp_url,
         req.param('page', 1),
     )
     """Check if exist an error"""
@@ -70,8 +78,9 @@ def scrapper_shows(req: Request, res: Response, next: Next):
 
 def scrapper_series(req: Request, res: Response, next: Next):
     """Validate obligate params"""
+    _wp_url=req.param('wp_url')
     _validate = validate_obligate_fields({
-        u'wp_url': req.param('wp_url'),
+        u'wp_url': _wp_url,
     })
 
     """Check if has errors return a error response"""
@@ -82,13 +91,16 @@ def scrapper_series(req: Request, res: Response, next: Next):
             )
         )
 
+    if _wp_url[-1]=='/':
+        _wp_url=_wp_url[:-1]
+
     """Get all novel from latests page"""
     _result = scrapper.scrapper_series(
         req.param('wp_login'),
         req.param('wp_admin'),
         req.param('wp_username'),
         req.param('wp_password'),
-        req.param('wp_url'),
+        _wp_url,
         req.param('origin', "cuevana"),
         req.param('page', 1),
     )
@@ -101,12 +113,13 @@ def scrapper_series(req: Request, res: Response, next: Next):
 
 def scrapper_torrents(req: Request, res: Response, next: Next):
     """Validate obligate params"""
+    _wp_url=req.param('wp_url')
     _validate = validate_obligate_fields({
         u'wp_login': req.param('wp_login'),
         u'wp_admin': req.param('wp_admin'),
         u'wp_username': req.param('wp_username'),
         u'wp_password': req.param('wp_password'),
-        u'wp_url': req.param('wp_url'),
+        u'wp_url': _wp_url,
     })
 
     """Check if has errors return a error response"""
@@ -117,13 +130,16 @@ def scrapper_torrents(req: Request, res: Response, next: Next):
             )
         )
 
+    if _wp_url[-1]=='/':
+        _wp_url=_wp_url[:-1]
+
     """Get all novel from latests page"""
     _result = scrapper.scrapper_torrents(
         req.param('wp_login'),
         req.param('wp_admin'),
         req.param('wp_username'),
         req.param('wp_password'),
-        req.param('wp_url'),
+        _wp_url,
         req.param('origin', "todotorrents"),
         req.param('page', 1),
     )
@@ -136,12 +152,13 @@ def scrapper_torrents(req: Request, res: Response, next: Next):
 
 def scrapper_hentai(req: Request, res: Response, next: Next):
     """Validate obligate params"""
+    _wp_url=req.param('wp_url')
     _validate = validate_obligate_fields({
         u'wp_login': req.param('wp_login'),
         u'wp_admin': req.param('wp_admin'),
         u'wp_username': req.param('wp_username'),
         u'wp_password': req.param('wp_password'),
-        u'wp_url': req.param('wp_url'),
+        u'wp_url': _wp_url,
     })
 
     """Check if has errors return a error response"""
@@ -152,13 +169,16 @@ def scrapper_hentai(req: Request, res: Response, next: Next):
             )
         )
 
+    if _wp_url[-1]=='/':
+        _wp_url=_wp_url[:-1]
+
     """Get all novel from latests page"""
     _result = scrapper.scrapper_hentai(
         req.param('wp_login'),
         req.param('wp_admin'),
         req.param('wp_username'),
         req.param('wp_password'),
-        req.param('wp_url'),
+        _wp_url,
         req.param('origin', "hentaila"),
         req.param('page', 1),
     )
