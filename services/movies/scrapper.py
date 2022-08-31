@@ -24,6 +24,7 @@ import services.general.constants as constants
 
 # Constants
 
+CUEVANA3_URLBASE = app.config.get('CUEVANA3_URLBASE')
 
 def scrapper_movies_publish(
     wp_login,
@@ -38,6 +39,7 @@ def scrapper_movies_publish(
     _url = '{0}/wp-admin/admin-ajax.php'.format(wp_url)
     _params = {
         u'range': _page,
+        u'urlbase': CUEVANA3_URLBASE,
         u'action': "action_{0}".format(origin)
     }
 
@@ -110,6 +112,10 @@ def scrapper_movies(
             origin,
             _page,
         )
+        if(len(_items) == 0):
+            print("*********_item.value = *********")
+            _item.created_at = _date
+            _session.commit()
     print("*********len(_items)*********")
     """Check if almost one item was published"""
     if(len(_items) == 0):
@@ -138,9 +144,8 @@ def scrapper_movies(
         if(len(_items) == 0):
             print("*********_item.value = *********")
             _item.value = str(int(_item.value)+1)
-
-        _session.commit()
-        _session.close()
+            _session.commit()
+    _session.close()
 
     """Transform data"""
     _data_response = {
